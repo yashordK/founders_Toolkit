@@ -1,0 +1,39 @@
+# env
+.env
+.env.local
+*.env
+
+# node
+node_modules/
+.next/
+out/
+dist/
+build/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# docker/data
+cognee_data/
+postgres_data/
+*.db
+
+# logs
+*.log
+npm-debug.log*
+
+# os
+.DS_Store
+Thumbs.db
+
+# editor
+.vscode/
+.idea/
+
+# secrets / keys
+*.pem
+*.key
+credentials.json
