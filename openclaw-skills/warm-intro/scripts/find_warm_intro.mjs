@@ -19,6 +19,9 @@
 // Env overrides:
 //   COGNEE_BASE_URL   default http://localhost:8000
 //   COGNEE_DATASET    default founders_second_brain
+//   VERIFY_LLM_API_KEY (and friends) -- see agent/verify/verify_recall.mjs
+
+import { verifyAgainstGraph } from "../../../agent/verify/verify_recall.mjs";
 
 const COGNEE_BASE_URL = process.env.COGNEE_BASE_URL || "http://localhost:8000";
 const DATASET_NAME = process.env.COGNEE_DATASET || "founders_second_brain";
@@ -64,16 +67,26 @@ async function main() {
       searchType: "GRAPH_COMPLETION",
       systemPrompt: RANKING_SYSTEM_PROMPT,
       topK: 25,
+      // A fresh session per call, not omitted. Cognee's session-turn logic
+      // (see cognee/infrastructure/session/session_turn.py) treats an
+      // omitted session_id as an ongoing default session and can short-circuit
+      // a query that looks like a repeat of a recent one with a bare "Got
+      // it." instead of actually answering -- confirmed by reproducing it
+      // during testing. This skill's calls are one-shot asks, not turns in a
+      // conversation, so each should look like a brand new session.
+      sessionId: crypto.randomUUID(),
     }),
   });
 
-  const body = await resp.text();
   if (!resp.ok) {
-    console.error(`recall() failed: ${resp.status} ${body}`);
+    console.error(`recall() failed: ${resp.status} ${await resp.text()}`);
     process.exit(1);
   }
+  const results = await resp.json();
+  const answer = results[0]?.text ?? "";
 
-  console.log(body);
+  const { verified, verdict } = await verifyAgainstGraph({ datasetName: DATASET_NAME, claim: answer });
+  console.log(JSON.stringify({ answer, verified, verdict }, null, 2));
 }
 
 main().catch((err) => {

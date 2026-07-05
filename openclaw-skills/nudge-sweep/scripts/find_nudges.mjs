@@ -5,12 +5,18 @@
 // live conversation via the main agent's own recall(), not on a sweep
 // schedule. See SKILL.md.
 //
+// Same unattended-cron failure behavior as daily-plan: an unverified answer
+// prints nothing to stdout and exits non-zero, so it doesn't get delivered.
+//
 // Usage:
 //   node find_nudges.mjs
 //
 // Env overrides:
 //   COGNEE_BASE_URL   default http://localhost:8000
 //   COGNEE_DATASET    default founders_second_brain
+//   VERIFY_LLM_API_KEY (and friends) -- see agent/verify/verify_recall.mjs
+
+import { verifyAgainstGraph } from "../../../agent/verify/verify_recall.mjs";
 
 const COGNEE_BASE_URL = process.env.COGNEE_BASE_URL || "http://localhost:8000";
 const DATASET_NAME = process.env.COGNEE_DATASET || "founders_second_brain";
@@ -35,16 +41,25 @@ async function main() {
       searchType: "GRAPH_COMPLETION",
       systemPrompt: SYSTEM_PROMPT,
       topK: 30,
+      // See openclaw-skills/warm-intro/scripts/find_warm_intro.mjs for why.
+      sessionId: crypto.randomUUID(),
     }),
   });
 
-  const body = await resp.text();
   if (!resp.ok) {
-    console.error(`recall() failed: ${resp.status} ${body}`);
+    console.error(`recall() failed: ${resp.status} ${await resp.text()}`);
+    process.exit(1);
+  }
+  const results = await resp.json();
+  const answer = results[0]?.text ?? "";
+
+  const { verified, verdict } = await verifyAgainstGraph({ datasetName: DATASET_NAME, claim: answer });
+  if (!verified) {
+    console.error(`nudge-sweep failed verification, not sending:\n${verdict}`);
     process.exit(1);
   }
 
-  console.log(body);
+  console.log(answer);
 }
 
 main().catch((err) => {

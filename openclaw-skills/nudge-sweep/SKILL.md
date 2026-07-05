@@ -37,9 +37,21 @@ Periodic cron/heartbeat tick only -- not user-invocable, there's no useful
 
 ## Notes
 
-- **Confirmed hallucination risk (see openclaw-skills/warm-intro/SKILL.md and
-  openclaw-skills/daily-plan/SKILL.md) applies here too** -- same recall()
-  pipeline, same model. Do not enable an unattended nudge cron job against a
-  real contact list until this is resolved or mitigated.
+- **Fabrication risk -- see openclaw-skills/warm-intro/SKILL.md.** Same
+  session_id fix and same `verifyAgainstGraph()` guard as `daily-plan` apply
+  here (same pipeline). Residual risk is smaller than first measured, but
+  spot-check a few runs before enabling this against a real contact list
+  unattended.
+- **Separate, structural limitation found in testing: date-arithmetic
+  errors slip past the verifier.** In one run the model claimed a contact's
+  last interaction was "over three weeks ago" when the actual date in the
+  graph was 3 days prior -- the individual dates cited were real (in the
+  graph), so `verifyAgainstGraph()` correctly passed it (it only checks
+  whether cited facts exist, not whether conclusions drawn from them are
+  arithmetically correct). This category of error needs a different fix --
+  e.g. computing "is this stale/is this birthday soon" in code from the raw
+  `last_interaction_date`/`birthday` fields (already available via `GET
+  /api/v1/datasets/{id}/graph`) instead of asking the model to do date math --
+  not attempted here for time.
 - The registered cron job and any `HEARTBEAT.md` reference to this skill live
   in the private OpenClaw workspace, not in this repo.

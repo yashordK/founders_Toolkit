@@ -50,10 +50,12 @@ dashboard is read-mostly" rule).
 - If `recall()` returns nothing interesting for a section, the script's
   system prompt tells it to omit that section rather than pad with "nothing
   to report" -- don't add filler on top of it.
-- **Confirmed hallucination risk (see openclaw-skills/warm-intro/SKILL.md).**
-  Tested this exact script against a dataset containing one contact and one
-  task; it returned three additional fabricated line items (two tasks, one
-  standing priority) that did not exist in the graph, proven via `GET
-  /api/v1/datasets/{id}/graph`. Do not send an unattended daily-plan message
-  to a real user until this is resolved or mitigated -- a wrong "you have an
-  overdue task" or a fabricated priority is worse than no message.
+- **Fabrication risk -- see openclaw-skills/warm-intro/SKILL.md for the full
+  story.** Short version: most of what first looked like model hallucination
+  here was actually cognee's session-turn logic misfiring because the script
+  didn't pass a `session_id` -- fixed by adding `sessionId:
+  crypto.randomUUID()` to the recall() call. A smaller residual risk of minor
+  ungrounded embellishments remains even with that fixed, which is what the
+  `verifyAgainstGraph()` call below is for: it blocks sending (exits 1,
+  prints nothing to stdout) if the synthesized plan contains a claim not
+  backed by the actual graph.

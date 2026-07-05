@@ -50,17 +50,25 @@ relationship cues visible in the synthesized context) but not guaranteed
 stable or reproducible run-to-run. If the demo needs a specific ranking
 order, verify it ahead of time rather than trusting it live.
 
-**Confirmed hallucination, not just a risk.** During testing,
-`openrouter/nvidia/nemotron-3-ultra-550b-a55b:free` fabricated specific,
-detailed facts (a meeting name+date, tasks, a standing priority) that did not
-exist anywhere in the dataset -- proven via `GET
-/api/v1/datasets/{id}/graph`, which returned the actual node list and showed
-none of it was there. This happened on more than one call, unprompted, with
-enough specificity that it looked real until checked against raw graph data.
-This is not a Cognee bug -- it's the model. For a memory product whose entire
-value proposition is factual recall, this is a serious, demo-threatening risk,
-not a nice-to-flag edge case. Do not trust a `recall()` answer at face value
-for anything demo-critical -- cross-check it against `GET
-/api/v1/datasets/{id}/graph` or `/data` first. Longer-term this needs either a
-more reliable model or a different verification step before answers reach the
-user.
+**Fabrication risk -- real, but smaller than first measured.** Initial testing
+seemed to show the model confidently fabricating entire meetings/tasks with no
+basis in the graph. Root-caused: most of that was actually cognee's own
+session-turn logic (`cognee/infrastructure/session/session_turn.py`), which
+treats an *omitted* `session_id` as an ongoing default session and can
+silently rewrite the effective query or short-circuit with a bare "Got it."
+based on (in our case, irrelevant) prior-turn context -- confirmed by
+reproducing both failure modes and then fixing them by passing a fresh
+`sessionId: crypto.randomUUID()` per call (see `find_warm_intro.mjs`). That
+was most of what looked like hallucination.
+
+With session isolation in place, a **smaller** residual risk remains: the
+model can still add a minor ungrounded embellishment on top of an otherwise
+correct, well-grounded answer (e.g. "leverage their expertise for current
+projects" when nothing about "current projects" exists anywhere) -- caught
+and reproduced during testing even after the session fix. This is what
+`agent/verify/verify_recall.mjs` exists for: it fetches `GET
+/api/v1/datasets/{id}/graph` (real ground truth) and asks a second LLM call to
+flag any claim not supported by it. Confirmed working: it let a correct answer
+through and blocked one with a genuine unsupported addition, in back-to-back
+runs. Still worth a spot-check before a live demo, but this is no longer the
+"do not trust anything" situation the first pass suggested.
