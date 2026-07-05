@@ -1,0 +1,24 @@
+{
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "default": {
+        "index_fields": [
+          "name"
+        ],
+        "identity_fields": [
+          "name"
+        ]
+      },
+      "type": "object"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "title": "Topic",
+  "type": "object"
+}

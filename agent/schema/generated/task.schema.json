@@ -1,0 +1,36 @@
+{
+  "properties": {
+    "description": {
+      "type": "string"
+    },
+    "due_date": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "status": {
+      "default": "open",
+      "type": "string"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "default": {
+        "index_fields": [
+          "description"
+        ]
+      },
+      "type": "object"
+    }
+  },
+  "required": [
+    "description"
+  ],
+  "title": "Task",
+  "type": "object"
+}
