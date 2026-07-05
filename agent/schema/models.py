@@ -76,4 +76,11 @@ class Meeting(BaseModel):
 ROOT_MODELS = {
     "Person": Person,
     "Meeting": Meeting,
+    # Also exposed standalone (not just nested under Meeting) for quick-note:
+    # a reminder-shaped note roots as a bare Task, a standing-priority/decision
+    # note roots as a bare Topic. Same classes, same identity_fields, so a
+    # Task/Topic captured this way still merges with one nested under a future
+    # Meeting.
+    "Task": Task,
+    "Topic": Topic,
 }
