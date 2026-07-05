@@ -1,0 +1,130 @@
+{
+  "$defs": {
+    "Topic": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "default": {
+            "index_fields": [
+              "name"
+            ],
+            "identity_fields": [
+              "name"
+            ]
+          },
+          "type": "object"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "Topic",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "expertise": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Topic"
+      },
+      "type": "array"
+    },
+    "background": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "how_they_help": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "met_at": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "met_date": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "birthday": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "last_interaction_date": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "tags": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "metadata": {
+      "additionalProperties": true,
+      "default": {
+        "index_fields": [
+          "name"
+        ],
+        "identity_fields": [
+          "name"
+        ]
+      },
+      "type": "object"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "title": "Person",
+  "type": "object"
+}
