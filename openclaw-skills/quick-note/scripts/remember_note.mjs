@@ -16,7 +16,10 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SCHEMA_DIR = path.join(__dirname, "..", "..", "..", "agent", "schema", "generated");
+// See remember_contact.mjs for why this isn't a bare relative walk-up --
+// openclaw skills install copies this directory rather than symlinking it.
+const REPO_ROOT = process.env.FOUNDERS_TOOLKIT_ROOT || path.join(__dirname, "..", "..", "..");
+const SCHEMA_DIR = path.join(REPO_ROOT, "agent", "schema", "generated");
 
 const COGNEE_BASE_URL = process.env.COGNEE_BASE_URL || "http://localhost:8000";
 const DATASET_NAME = process.env.COGNEE_DATASET || "founders_second_brain";

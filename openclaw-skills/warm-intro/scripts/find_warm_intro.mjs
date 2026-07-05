@@ -21,7 +21,19 @@
 //   COGNEE_DATASET    default founders_second_brain
 //   VERIFY_LLM_API_KEY (and friends) -- see agent/verify/verify_recall.mjs
 
-import { verifyAgainstGraph } from "../../../agent/verify/verify_recall.mjs";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import path from "node:path";
+
+// openclaw skills install COPIES this directory rather than symlinking it, so
+// a static relative import of ../../../agent/verify/verify_recall.mjs only
+// works running directly from the founders_Toolkit checkout, not from the
+// installed copy under ~/.openclaw/workspace/skills/. Resolve dynamically via
+// FOUNDERS_TOOLKIT_ROOT instead -- see remember_contact.mjs for the same fix.
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = process.env.FOUNDERS_TOOLKIT_ROOT || path.join(__dirname, "..", "..", "..");
+const { verifyAgainstGraph } = await import(
+  pathToFileURL(path.join(REPO_ROOT, "agent", "verify", "verify_recall.mjs")).href
+);
 
 const COGNEE_BASE_URL = process.env.COGNEE_BASE_URL || "http://localhost:8000";
 const DATASET_NAME = process.env.COGNEE_DATASET || "founders_second_brain";

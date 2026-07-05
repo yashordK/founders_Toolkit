@@ -16,16 +16,13 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SCHEMA_PATH = path.join(
-  __dirname,
-  "..",
-  "..",
-  "..",
-  "agent",
-  "schema",
-  "generated",
-  "person.schema.json",
-);
+// openclaw skills install COPIES this directory rather than symlinking it,
+// so the relative "../../.." walk-up only works when running directly from
+// the founders_Toolkit checkout. Once installed into ~/.openclaw/workspace/
+// skills/, that walk-up lands outside any real repo. FOUNDERS_TOOLKIT_ROOT
+// must be set for the installed copy to find the real agent/schema/generated/.
+const REPO_ROOT = process.env.FOUNDERS_TOOLKIT_ROOT || path.join(__dirname, "..", "..", "..");
+const SCHEMA_PATH = path.join(REPO_ROOT, "agent", "schema", "generated", "person.schema.json");
 
 const COGNEE_BASE_URL = process.env.COGNEE_BASE_URL || "http://localhost:8000";
 const DATASET_NAME = process.env.COGNEE_DATASET || "founders_second_brain";
