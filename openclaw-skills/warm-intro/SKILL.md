@@ -50,12 +50,17 @@ relationship cues visible in the synthesized context) but not guaranteed
 stable or reproducible run-to-run. If the demo needs a specific ranking
 order, verify it ahead of time rather than trusting it live.
 
-**Confirmed hallucination risk with the current free-tier model.** During
-testing, `openrouter/nvidia/nemotron-3-ultra-550b-a55b:free` cited a specific
-meeting ("Fundraising Strategy Sync", with a date) that did not exist anywhere
-in the queried dataset -- confirmed absent via a follow-up recall asking it to
-list only what was explicitly in context. This is not a Cognee bug -- it is
-the model fabricating a plausible-sounding, unrequested detail. For a memory
-product whose entire value proposition is factual recall, this is a real risk
-worth weighing before the live demo: either accept it as a known limitation of
-the free tier, or budget for a more reliable model for the actual event.
+**Confirmed hallucination, not just a risk.** During testing,
+`openrouter/nvidia/nemotron-3-ultra-550b-a55b:free` fabricated specific,
+detailed facts (a meeting name+date, tasks, a standing priority) that did not
+exist anywhere in the dataset -- proven via `GET
+/api/v1/datasets/{id}/graph`, which returned the actual node list and showed
+none of it was there. This happened on more than one call, unprompted, with
+enough specificity that it looked real until checked against raw graph data.
+This is not a Cognee bug -- it's the model. For a memory product whose entire
+value proposition is factual recall, this is a serious, demo-threatening risk,
+not a nice-to-flag edge case. Do not trust a `recall()` answer at face value
+for anything demo-critical -- cross-check it against `GET
+/api/v1/datasets/{id}/graph` or `/data` first. Longer-term this needs either a
+more reliable model or a different verification step before answers reach the
+user.
