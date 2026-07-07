@@ -18,16 +18,3 @@ cp .env.template .env   # set LLM_API_KEY
 docker compose --profile postgres up
 ```
 
-See `docs/TRD.md` for full architecture and `docs/PRD.md` for scope.
-
-## Project docs
-- `docs/PRD.md` — product scope
-- `docs/TRD.md` — architecture & schema
-- `docs/IMPLEMENTATION_PLAN.md` — build steps
-- `docs/TEAM_SPLIT.md` — ownership
-- `docs/ROADMAP.md` — post-hackathon phased plan
-- `docs/ADR_TEMPLATE.md` — decision record template
-- `CLAUDE.md` — build agent directives and git workflow rules
-
-## Status
-Early build — see `docs/OPEN_ITEMS.md` for unresolved items.
